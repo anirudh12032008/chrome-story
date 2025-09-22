@@ -1,0 +1,15 @@
+{
+    "name": "Story",
+    "version": "1.0.0",
+    "description": "automatically takes screenshots of the pages you visit and turns them into a visual storyboard, letting you see and share your entire browsing session like a chapter!",
+    "manifest_version": 3,
+    "author": "Anirudh Sahu",
+    "action":{
+        "default_popup": "popup.html",
+        "default_title": "Story"
+    },
+      "permissions": ["tabs", "storage", "activeTab"],
+      "background": {
+    "service_worker": "background.js"
+  }
+}
