@@ -84,7 +84,9 @@ t.className = "font-semibold truncate";
     u.className = "text-blue-400 text-sm truncate";
     u.href = url;
     u.target = "_blank";
-    u.innerText = url;
+    // this was causing issues due to google search having too big urls
+    // u.innerText = url;
+    
     const ti = document.createElement('div');
     ti.className = "text-xs text-gray-400";
     ti.innerText = new Date(time).toLocaleString();
