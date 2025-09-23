@@ -1,9 +1,23 @@
 
 
 const start = document.getElementById('start');
-const stop = document.getElementById('stop');
+// const stop = document.getElementById('stop');
 const board = document.getElementById('board');
 const exportbtn = document.getElementById('export');
+const auto = document.getElementById('auto');
+const autostart = document.getElementById('autostart');
+const autostop = document.getElementById('autostop');
+
+let automode = false;
+let autorunning = false;
+
+// auto mode stuff
+// chrome.runtime.onMessage.addListener((msg, s, sr) => {
+// if (msg.type === 'toggle'){
+//     automode = !automode;
+//     sr({ automode });
+// }
+
 
 // i need to remove this in end
 // function screenshot(){
@@ -25,7 +39,7 @@ async function capture() {
     // photo time hehe
     chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' }, function (url) {
         if (chrome.runtime.lastError || !url) {
-            console.error(chrome.runtime.lastError);
+            console.log(chrome.runtime.lastError);
             return null;
         }
         const title = tab.title || 'no title';
@@ -171,20 +185,31 @@ t.className = "font-semibold";
 start.addEventListener('click', async () => {
     // const img = screenshot();
     // addcard(img, "This is a test title");
-    capture();
+    // capture();
+        const i = document.getElementById('ch').value;
+        if (!i) {
+            alert("bruhh no chapter selected :angry:");
+            return;
+        }
+
+        chrome.runtime.sendMessage({ type: 'manual', id: i });
     console.log("start clicked");
 });
 
-stop.addEventListener('click', async () => {
-    console.log("stop clicked");
-});
+// stop.addEventListener('click', async () => {
+//     console.log("stop clicked");
+// });
 
 exportbtn.addEventListener('click', async () => {
     console.log("export clicked");
 });
 
 document.getElementById('ch').addEventListener('change', (e) => {
-    load(e.target.value);
+    const i = e.target.value
+    load(i);
+    console.log(i);
+    chrome.storage.local.set({ cc: i });
+
 });
 
 document.getElementById('add').addEventListener('click', () => {
@@ -193,8 +218,71 @@ document.getElementById('add').addEventListener('click', () => {
     if (name){
         chapter(name);
         inp.value = '';
+        chrome.storage.local.set({ cc: name });
+
     } else{
         alert("Dumb! enter a chapter name");
     }
 });
 loadC();
+
+auto.addEventListener('click', async () => {
+    automode = !automode;
+    auto.innerText = automode ? "Turn OF" : "Turn ON";
+    console.log(automode);
+    chrome.storage.local.set({ automode });  
+    alert(automode);
+});
+
+autostart.addEventListener('click', async () => {
+    if(!automode){
+        alert("Dumb! turn on the auto mode first");
+        return;
+    }
+    autorunning = true;
+    // autostart.disabled = true;
+    // autostop.disabled = false;
+    chrome.storage.local.set({ autorunning }); 
+    chrome.runtime.sendMessage({ type: 'start' });
+});
+
+autostop.addEventListener('click', async () => {
+    if(!automode){
+        alert("Dumb! turn on the auto mode first");
+        return;
+    }
+    autorunning = false;
+    // autostart.disabled = false;
+    // autostop.disabled = true;
+    chrome.storage.local.set({ autorunning }); 
+    chrome.runtime.sendMessage({ type: 'stop' });
+});
+
+function change(){
+    if (autorunning && automode){
+        capture();  
+}}
+
+
+chrome.runtime.onMessage.addListener((msg, s, sr) => {
+    if (msg.type === 'capture'){
+        capture();
+    }
+});
+
+// load the first chapter in the list on startup
+chrome.storage.local.get({ chapters: [] }, function (r) {
+    if (r.chapters && r.chapters.length > 0) {
+        const first = r.chapters[0];
+        load(first.id);
+        document.getElementById('ch').value = first.id;
+    } else{
+        console.log("nothing");        
+    }
+    }
+    );
+chrome.storage.local.get({ automode: false, autorunning: false }, (r) => {
+    automode = r.automode;
+    autorunning = r.autorunning;
+    auto.innerText = automode ? "Turn OFF auto mode" : "Turn ON auto mode";
+});

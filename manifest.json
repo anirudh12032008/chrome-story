@@ -1,16 +1,23 @@
 {
-    "name": "Story",
-    "version": "1.0.0",
-    "description": "automatically takes screenshots of the pages you visit and turns them into a visual storyboard (saves in png format), letting you see and share your entire browsing session like a chapter!",
-    "manifest_version": 3,
-    "author": "Anirudh Sahu",
-    "action":{
-      "default_popup": "popup.html",
-        "default_title": "Story"
-    },
-      "permissions": ["tabs", "storage", "scripting"],
-"host_permissions": ["<all_urls>"],
-      "background": {
-    "service_worker": "popup.js"
-  }
+  "name": "Story",
+  "version": "1.0.0",
+  "description": "Automatically takes screenshots of the pages you visit and turns them into a visual storyboard (saves in PNG format), letting you see and share your entire browsing session like a chapter!",
+  "manifest_version": 3,
+  "author": "Anirudh Sahu",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Story"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "activeTab"    
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+}
 }
