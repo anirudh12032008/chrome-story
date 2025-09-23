@@ -1,3 +1,5 @@
+
+
 const start = document.getElementById('start');
 const stop = document.getElementById('stop');
 const board = document.getElementById('board');
@@ -21,18 +23,19 @@ async function capture() {
             return null;
         }
         const title = tab.title || 'Screenshot';
-        addcard(url, title);
-        save(url, title);
+        const time = Date.now();
+        addcard(url, title, tab.url, time);
+        save(url, title, tab.url, time);
         console.log("proof taken hahaha");
     });
 }
 
 
 // so idk how to save this thing in DB or smth so i'll just save it in local storage for now
-function save(img, title){
+function save(img, title, url, time){
     chrome.storage.local.get({ cards: [] }, function (r) {
         const c = r.cards;
-        c.push({ img: img, title: title, timestamp: Date.now() });
+        c.push({ img: img, title: title, url: url, time: time });
         chrome.storage.local.set({ cards: c }, function () {
             console.log('your history sent to your mom :hahahahahahahah:', title);
         });
@@ -43,25 +46,54 @@ function load(){
     chrome.storage.local.get({ cards: [] }, function (r) {
         const c = r.cards;
         c.forEach(card => {
-            addcard(card.img, card.title);
+            addcard(card.img, card.title, card.url, card.time);
         }
-        );
+    );
     });
 }
 load();
 
-function addcard(img, title) {
+let count = 0
+
+function addcard(img, title, url, time) {
+    count++;
     const x = document.createElement('div');
-    x.className = "flex flex-col items-center bg-gray-700 text-white p-3 my-2 rounded-xl shadow-xl hover:scale-107 transform transition-all duration-500";
+    x.className = "flex flex-col items-center bg-gray-700 text-white p-3 my-2 rounded-xl shadow-xl hover:scale-107 transform transition-all duration-500 w-full";
     const image = document.createElement('img');
     image.src = img;
-    image.className = "w-auto h-auto object-cover rounded-xl shadow-xl";
-    const text = document.createElement('div');
-    text.className = "text-white text-lg font-semibold mt-2 ";
-    text.innerText = title;
+    image.className = "w-full h-40 object-cover rounded-t-xl shadow-xl";
+   
+    // i was making a mistake here so I am just making a new div for everything
+    // const dets = document.createElement('div');
+    // dets.className ="w-full mt-2 p-2 text-left";
 
+    // const no = document.createElement('div');
+    // no.className = "text-sm text-gray-300";
+    // no.textContent = `#${count} - ${new Date(time).toLocaleString()}`;
+
+    const dets = document.createElement('div');
+    dets.className = "flex flex-col justify-between items-start p-2 space-y-1";
+
+    const no = document.createElement('div');
+    no.className = "text-sm text-gray-300";
+    no.textContent = `#${count}`;
+const t = document.createElement('div');
+t.className = "font-semibold truncate";
+    t.innerText = title;
+    const u = document.createElement('a');
+    u.className = "text-blue-400 text-sm truncate";
+    u.href = url;
+    u.target = "_blank";
+    u.innerText = url;
+    const ti = document.createElement('div');
+    ti.className = "text-xs text-gray-400";
+    ti.innerText = new Date(time).toLocaleString();
+    dets.appendChild(no);
+    dets.appendChild(t);
+    dets.appendChild(u);
+    dets.appendChild(ti);
     x.appendChild(image);
-    x.appendChild(text);
+    x.appendChild(dets);
     board.appendChild(x);
 }
 
