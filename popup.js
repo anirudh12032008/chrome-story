@@ -12,6 +12,12 @@ const exportbtn = document.getElementById('export');
 
 // the most fucking part :(
 async function capture() {
+    const drop = document.getElementById('ch');
+    const ch = drop.value;
+    if (!ch) {
+        alert("Dumb! select a chapter first");
+        return null;
+    }
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab){
         return null;
@@ -22,36 +28,92 @@ async function capture() {
             console.error(chrome.runtime.lastError);
             return null;
         }
-        const title = tab.title || 'Screenshot';
+        const title = tab.title || 'no title';
         const time = Date.now();
-        addcard(url, title, tab.url, time);
-        save(url, title, tab.url, time);
+        addcard(url, title, tab.url, time, ch);
+        save(url, title, tab.url, time, ch);
         console.log("proof taken hahaha");
+    });
+}
+
+function chapter(title){
+    const id = Date.now().toString();
+    chrome.storage.local.get({ chapters: [] }, function (r) {
+        r.chapters.push({ id: id, title: title, time: Date.now(), cards: [] });
+        chrome.storage.local.set({ chapters: r.chapters }, function () {
+            loadC();
+        });
+    }   );
+}
+
+function loadC(){
+    const drop = document.getElementById('ch');
+    drop.innerHTML = '';
+    chrome.storage.local.get({ chapters: [] }, function (r) {
+        r.chapters.forEach(ch => {
+            const o = document.createElement('option');
+            o.value = ch.id;
+            o.innerText = ch.title;
+            drop.appendChild(o);
+        });
     });
 }
 
 
 // so idk how to save this thing in DB or smth so i'll just save it in local storage for now
-function save(img, title, url, time){
-    chrome.storage.local.get({ cards: [] }, function (r) {
-        const c = r.cards;
-        c.push({ img: img, title: title, url: url, time: time });
-        chrome.storage.local.set({ cards: c }, function () {
-            console.log('your history sent to your mom :hahahahahahahah:', title);
-        });
-    });
+function save(img, title, url, time, ch){
+    // chrome.storage.local.get({ cards: [] }, function (r) {
+    //     const c = r.cards;
+    //     c.push({ img: img, title: title, url: url, time: time });
+    //     chrome.storage.local.set({ cards: c }, function () {
+    //         console.log('your history sent to your mom :hahahahahahahah:', title);
+    //     });
+    // });
+    chrome.storage.local.get({ chapters: [] }, function (r) {
+        const chapters = r.chapters;
+        const chapter = chapters.find(c => c.id === ch);
+        if (chapter) {
+            chapter.cards.push({ img: img, title: title, url: url, time: time });
+            chrome.storage.local.set({ chapters: chapters }, function () {
+                console.log('your history sent to your mom :hahahahahahahah:', title);
+            });
+        } else {
+            alert("Dumb! i didn't find this chapter");
+        }
+    }  );
 }
 
-function load(){
-    chrome.storage.local.get({ cards: [] }, function (r) {
-        const c = r.cards;
-        c.forEach(card => {
+function load(id){
+    // chrome.storage.local.get({ cards: [] }, function (r) {
+    //     const c = r.cards;
+    //     c.forEach(card => {
+    //         addcard(card.img, card.title, card.url, card.time);
+    //     }
+    // );
+    // });
+    board.innerHTML = '';
+    chrome.storage.local.get({ chapters: [] }, function (r) {
+        const chapters = r.chapters;
+        if (!chapters || chapters.length === 0) {
+            alert("bruuuhhhh! create a chapter first");
+            return;
+        }
+        const ch = chapters.find(c => c.id === id);
+        if (!ch) {
+            alert("Dumb! i didn't find this chapter");
+            return;
+        }
+        count = 0
+        ch.cards.forEach(card => {
             addcard(card.img, card.title, card.url, card.time);
         }
+        );
+
+    }
     );
-    });
 }
-load();
+// before chapter added code ---> <----
+// load();
 
 let count = 0
 
@@ -68,7 +130,6 @@ function addcard(img, title, url, time) {
     // i was making a mistake here so I am just making a new div for everything
     // const dets = document.createElement('div');
     // dets.className ="w-full mt-2 p-2 text-left";
-
     // const no = document.createElement('div');
     // no.className = "text-sm text-gray-300";
     // no.textContent = `#${count} - ${new Date(time).toLocaleString()}`;
@@ -121,3 +182,19 @@ stop.addEventListener('click', async () => {
 exportbtn.addEventListener('click', async () => {
     console.log("export clicked");
 });
+
+document.getElementById('ch').addEventListener('change', (e) => {
+    load(e.target.value);
+});
+
+document.getElementById('add').addEventListener('click', () => {
+    const inp = document.getElementById('name');
+    const name = inp.value.trim();
+    if (name){
+        chapter(name);
+        inp.value = '';
+    } else{
+        alert("Dumb! enter a chapter name");
+    }
+});
+loadC();
