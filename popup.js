@@ -276,11 +276,11 @@ function delC(id){
     const c = document.getElementById('ch').value;
     chrome.storage.local.get({chapters: []}, function(r){
         const chs = r.chapters;
-        const ch = chs.find(c => c.id == c);
+        const ch = chs.find(x => x.id == c);
         if (ch){
             ch.cards = ch.cards.filter(card => card.time != id);
             chrome.storage.local.set({chapters: chs}, function(){
-                load(c);
+                // load(c);
             })
         }
     })
