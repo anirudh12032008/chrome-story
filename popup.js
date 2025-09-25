@@ -29,7 +29,7 @@ async function capture() {
     const drop = document.getElementById('ch');
     const ch = drop.value;
     if (!ch) {
-        alert("Dumb! select a chapter first");
+        toast("Dumb! select a chapter first", "error");
         return null;
     }
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -40,6 +40,7 @@ async function capture() {
     chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' }, function (url) {
         if (chrome.runtime.lastError || !url) {
             console.log(chrome.runtime.lastError);
+            toast(chrome.runtime.lastError, "error");
             return null;
         }
         const title = tab.title || 'no title';
@@ -48,6 +49,7 @@ async function capture() {
         save(url, title, tab.url, time, ch);
         load(ch);
         console.log("proof taken hahaha");
+        toast("proof taken and sent to your mom, hahaha", "success");
     });
 }
 
@@ -114,10 +116,11 @@ function save(img, title, url, time, ch){
         if (chapter) {
             chapter.cards.push({ img: img, title: title, url: url, time: time });
             chrome.storage.local.set({ chapters: chapters }, function () {
-                console.log('your history sent to your mom :hahahahahahahah:', title);
+                console.log(`your ${title} history sent to your mom :hahahahahahahah: now cry`, title);
+                toast(`your ${title} history sent to your mom :hahahahahahahah: now cry`, "success");
             });
         } else {
-            alert("Dumb! i didn't find this chapter");
+            toast("Dumb! i didn't find this chapter", "error");
         }
     }  );
 }
@@ -134,12 +137,12 @@ function load(id){
     chrome.storage.local.get({ chapters: [] }, function (r) {
         const chapters = r.chapters;
         if (!chapters || chapters.length === 0) {
-            alert("bruuuhhhh! create a chapter first");
+            toast("bruuuhhhh! create a chapter first", "warning");
             return;
         }
         const ch = chapters.find(c => c.id === id);
         if (!ch) {
-            alert("Dumb! i didn't find this chapter");
+            toast("Dumb! i didn't find this chapter", "error");
             return;
         }
         count = 0
@@ -156,7 +159,7 @@ function load(id){
 function editCh(id){
     const newt = prompt("damn! why you changing soo much stuff! ahhh, write the new name then: ");
     if (!newt) {
-        alert("Dumb! no name entered you thought I didn't had the error handling, hahaha");
+        toast("Dumb! no name entered you thought I didn't had the error handling, hahaha", "error");
 
         return;
     }
@@ -167,6 +170,7 @@ function editCh(id){
             ch.title = newt;
             chrome.storage.local.set({ chapters: chs }, function () {
                 loadC();
+                toast("Chapter Edited :thumbsup:", "success")
                 const curr = document.getElementById('ch').value;
                 if (curr === id){
                     load(curr);
@@ -184,6 +188,7 @@ function delCh(id){
         let chs = r.chapters.filter(c => c.id != id);
         chrome.storage.local.set({chapters:chs}, function(){
             loadC();
+            toast("Chapter sent into blackhole :( ", "success")
             const d = document.getElementById('ch').value;
             if (chs.length > 0){
                 d.value = chs[0].id;
@@ -280,7 +285,7 @@ function delC(id){
         if (ch){
             ch.cards = ch.cards.filter(card => card.time != id);
             chrome.storage.local.set({chapters: chs}, function(){
-                // load(c);
+                toast("Card sent to blackhole :(", "success");
             })
         }
     })
@@ -292,12 +297,15 @@ start.addEventListener('click', async () => {
     // capture();
         const i = document.getElementById('ch').value;
         if (!i) {
-            alert("bruhh no chapter selected :angry:");
+            toast("bruhh no chapter selected :angry:", "error");
             return;
         }
 
         chrome.runtime.sendMessage({ type: 'manual', id: i });
     console.log("start clicked");
+    // toast("start clicked", "info");
+            toast("proof taken and sent to your mom, hahaha", "success");
+
 });
 
 // stop.addEventListener('click', async () => {
@@ -306,6 +314,8 @@ start.addEventListener('click', async () => {
 
 exportbtn.addEventListener('click', async () => {
     console.log("export clicked");
+    // this is tuff :sadge:
+    toast("export clicked", "info");
 });
 
 document.getElementById('ch').addEventListener('change', (e) => {
@@ -327,10 +337,11 @@ document.getElementById('add').addEventListener('click', () => {
                 loadC();
                 inp.value = '';
                 chrome.storage.local.set({ cc: id }); 
+                toast("CHAPTER ADDED :yayaya:", "success");
             });
         });
     } else{
-        alert("Dumb! enter a chapter name");
+        toast("Dumb! enter a chapter name", "error");
     }
 });
 loadC();
@@ -340,14 +351,15 @@ auto.addEventListener('click', async () => {
     auto.innerText = automode ? "Turn OFF auto mode" : "Turn ON auto mode";
     console.log(automode);
     chrome.storage.local.set({ automode });  
-    alert(automode);
+    toast( `Automde = ${automode}`, "success");
 });
 
 autostart.addEventListener('click', async () => {
     if(!automode){
-        alert("Dumb! turn on the auto mode first");
+        toast("Dumb! turn on the auto mode first", "warning");
         return;
     }
+    toast("Starting the auto proof taking :D", "info")
     autorunning = true;
     autostart.disabled = true;
     autostop.disabled = false;
@@ -357,9 +369,10 @@ autostart.addEventListener('click', async () => {
 
 autostop.addEventListener('click', async () => {
     if(!automode){
-        alert("Dumb! turn on the auto mode first");
+        toast("Dumb! turn on the auto mode first" , "warning");
         return;
     }
+    toast("Stopping :(", "info");
     autorunning = false;
     autostart.disabled = false;
     autostop.disabled = true;
@@ -386,7 +399,7 @@ chrome.storage.local.get({ chapters: [] }, function (r) {
         load(first.id);
         document.getElementById('ch').value = first.id;
     } else{
-        console.log("nothing");        
+        toast("nothing", "warning");        
     }
     }
     );
@@ -408,7 +421,7 @@ chrome.storage.onChanged.addListener((c, a) => {
 document.getElementById('manage').addEventListener('click', () => {
     const l = document.getElementById('list');
     l.classList.toggle('hidden');
-
+    toast("Hmmm I don't like manager :/", "info")
 });
 
 
@@ -419,3 +432,28 @@ chrome.storage.local.get({automode: false, autorunning: false}, (r) => {
     autostart.disabled = autorunning
     autostop.disabled = !autorunning
 })
+
+
+function toast(msg, type='info'){
+    const c = document.getElementById('toast');
+    const color = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+    info: 'bg-blue-600',
+warning: 'bg-yellow-600'    }
+const t = document.createElement('div');
+t.className = `f;ex items-center px-4 py-2 text-white rounded-xl shadow-xl ${color[type]}`
+t.innerHTML = msg;
+c.appendChild(t);
+
+requestAnimationFrame(() => {
+    toast.classList.remove('opacity-0', "trasnlate-y-4");
+    // toast.classList.add('opacity-100', "translate-y-0");
+})
+setTimeout(() => {
+    t.classList.add('opacity-0', "translate-y-4");
+    setTimeout(() => {
+        c.removeChild(t)
+    }, 500);
+}, 7000);
+}
