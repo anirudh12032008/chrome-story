@@ -378,6 +378,7 @@ toast("EXPORTED JSON YAYAYY :D", "success")
 
 
         // trying jspdf :/
+        // PS- WORKING :D
         const {jsPDF} = window.jspdf;
         const doc = new jsPDF();
 // doc.text("Hello world!", 10, 10);
@@ -387,13 +388,13 @@ doc.text(ch.title, 10,20);
 let y =31
 if (ch.cards && ch.cards.length){
     ch.cards.forEach((c, i)=>{
-        doc.setfontSize(16);
+        doc.setFontSize(16);
         doc.text(`${i+1} --- ${c.title}`, 10, y)
         y += 6
         doc.setFontSize(10);
         doc.text(`URL --- ${c.url}`, 10, y)
         y+= 6 
-        doc.image(c.img, 'PNG', 10, y, 180, 100);   
+        doc.addImage(c.img, 'PNG', 10, y, 180, 100);   
         y += 117 
         if (y >270){
             doc.addPage();
