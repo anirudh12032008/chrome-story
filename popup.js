@@ -46,6 +46,7 @@ async function capture() {
         const time = Date.now();
         addcard(url, title, tab.url, time, ch);
         save(url, title, tab.url, time, ch);
+        load(ch);
         console.log("proof taken hahaha");
     });
 }
@@ -62,6 +63,8 @@ function chapter(title){
 
 function loadC(){
     const drop = document.getElementById('ch');
+    const list = document.getElementById('list');
+    list.innerHTML = '';
     drop.innerHTML = '';
     chrome.storage.local.get({ chapters: [] }, function (r) {
         r.chapters.forEach(ch => {
@@ -69,6 +72,28 @@ function loadC(){
             o.value = ch.id;
             o.innerText = ch.title;
             drop.appendChild(o);
+
+            const d = document.createElement('div');
+            d.className = "flex items-center bg-slate-700 p-2 rounded-xl";
+            const t = document.createElement('div');
+            t.className = "font-semibold text-white ";
+            t.innerText = ch.title;
+
+            const action = document.createElement('div');
+
+            const edit = document.createElement('button');
+            edit.className = "p-2 bg-yellow-600 rounded-xl shadow-xl hover:bg-blue-800 mx-2  text-black";
+            edit.innerText = "Edit";
+            edit.onclick = () => editCh(ch.id);
+            const del = document.createElement('button');
+            del.className = "p-2 bg-red-600 rounded-xl shadow-xl hover:bg-blue-800 mx-2 text-white";
+            del.innerText = "Delete";
+            del.onclick = () => delCh(ch.id);
+            action.appendChild(edit);
+            action.appendChild(del);
+            d.appendChild(t);
+            d.appendChild(action);
+            list.appendChild(d);
         });
     });
 }
@@ -126,6 +151,56 @@ function load(id){
     }
     );
 }
+
+
+function editCh(id){
+    const newt = prompt("damn! why you changing soo much stuff! ahhh, write the new name then: ");
+    if (!newt) {
+        alert("Dumb! no name entered you thought I didn't had the error handling, hahaha");
+
+        return;
+    }
+    chrome.storage.local.get({chapters: []}, function(r){
+        const chs = r.chapters
+        const ch = chs.find(c => c.id == id);
+        if (ch){
+            ch.title = newt;
+            chrome.storage.local.set({ chapters: chs }, function () {
+                loadC();
+                const curr = document.getElementById('ch').value;
+                if (curr === id){
+                    load(curr);
+                }
+        }
+        );
+        }
+
+    })
+}
+
+function delCh(id){
+    if (!confirm("broo this is not a joke!!? this would be sent in a blackhole are you sure")) return;
+    chrome.storage.local.get({chapters: []}, function(r){
+        let chs = r.chapters.filter(c => c.id != id);
+        chrome.storage.local.set({chapters:chs}, function(){
+            loadC();
+            const d = document.getElementById('ch').value;
+            if (chs.length > 0){
+                d.value = chs[0].id;
+            load(d.value) 
+        chrome.storage.local.set({ cc: d.value });
+            } else{
+                document.getElementById('board').innerHTML = '';
+                d.innerHTML = '';
+                chrome.storage.local.remove('cc');
+
+            }
+        });
+
+    }   );
+
+}
+
 // before chapter added code ---> <----
 // load();
 
@@ -173,6 +248,8 @@ t.className = "font-semibold";
     const ti = document.createElement('div');
     ti.className = "text-xs text-gray-400";
     ti.innerText = new Date(time).toLocaleString();
+
+    const del = document.createElement('button');
     dets.appendChild(no);
     dets.appendChild(t);
     dets.appendChild(u);
@@ -180,6 +257,7 @@ t.className = "font-semibold";
     x.appendChild(image);
     x.appendChild(dets);
     board.appendChild(x);
+    // loadC();
 }
 
 start.addEventListener('click', async () => {
@@ -216,10 +294,15 @@ document.getElementById('add').addEventListener('click', () => {
     const inp = document.getElementById('name');
     const name = inp.value.trim();
     if (name){
-        chapter(name);
-        inp.value = '';
-        chrome.storage.local.set({ cc: name });
-
+        const id = Date.now().toString(); 
+        chrome.storage.local.get({ chapters: [] }, function (r) {
+            r.chapters.push({ id: id, title: name, time: Date.now(), cards: [] });
+            chrome.storage.local.set({ chapters: r.chapters }, function () {
+                loadC();
+                inp.value = '';
+                chrome.storage.local.set({ cc: id }); 
+            });
+        });
     } else{
         alert("Dumb! enter a chapter name");
     }
@@ -228,7 +311,7 @@ loadC();
 
 auto.addEventListener('click', async () => {
     automode = !automode;
-    auto.innerText = automode ? "Turn OF" : "Turn ON";
+    auto.innerText = automode ? "Turn OFF auto mode" : "Turn ON auto mode";
     console.log(automode);
     chrome.storage.local.set({ automode });  
     alert(automode);
@@ -240,8 +323,8 @@ autostart.addEventListener('click', async () => {
         return;
     }
     autorunning = true;
-    // autostart.disabled = true;
-    // autostop.disabled = false;
+    autostart.disabled = true;
+    autostop.disabled = false;
     chrome.storage.local.set({ autorunning }); 
     chrome.runtime.sendMessage({ type: 'start' });
 });
@@ -252,8 +335,8 @@ autostop.addEventListener('click', async () => {
         return;
     }
     autorunning = false;
-    // autostart.disabled = false;
-    // autostop.disabled = true;
+    autostart.disabled = false;
+    autostop.disabled = true;
     chrome.storage.local.set({ autorunning }); 
     chrome.runtime.sendMessage({ type: 'stop' });
 });
@@ -286,3 +369,27 @@ chrome.storage.local.get({ automode: false, autorunning: false }, (r) => {
     autorunning = r.autorunning;
     auto.innerText = automode ? "Turn OFF auto mode" : "Turn ON auto mode";
 });
+
+
+chrome.storage.onChanged.addListener((c, a) => {
+    if (a === 'local' && c.chapters) {
+        const curr = document.getElementById('ch').value;
+        if (curr) load(curr);
+    }
+});
+
+
+document.getElementById('manage').addEventListener('click', () => {
+    const l = document.getElementById('list');
+    l.classList.toggle('hidden');
+
+});
+
+
+chrome.storage.local.get({automode: false, autorunning: false}, (r) => {
+    automode = r.automode;
+    autorunning = r.autorunning;
+    auto.innerText = automode ? "Turn OFF auto mode" : "Turn ON auto mode";
+    autostart.disabled = autorunning
+    autostop.disabled = !autorunning
+})

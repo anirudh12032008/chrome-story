@@ -1,23 +1,22 @@
 let run = false;
 
 console.log("Background loaded");
-chrome.runtime.onMessage.addListener((msg, s, sr) => {
-    console.log("Message received:", msg);
-});
 
 const last = {};
 
 chrome.runtime.onMessage.addListener((msg, s, sr) => {
+        console.log("Message received:", msg);
+
     if (msg.type === 'start'){
         run = true;
         chrome.tabs.onActivated.addListener(change);
-        chrome.tabs.onUpdated.addListener(change);
+        chrome.tabs.onUpdated.addListener(tabup);
     }
 
     if (msg.type === 'stop'){
         run = false;
         chrome.tabs.onActivated.removeListener(change);
-        chrome.tabs.onUpdated.removeListener(change);
+        chrome.tabs.onUpdated.removeListener(tabup);
     }
      if (msg.type === 'manual') {
         capture(msg.id);
@@ -33,8 +32,21 @@ function change(id, info, tab) {
                         console.log("idgaf bro has no chapter");
 
         } 
-        const now = Date.now()
+        // const now = Date.now();
+        // if (!last[res.cc] || now - last[res.cc] > 1000) {
+        //     last[res.cc] = now;
+        //     capture(res.cc);
+        // } else {
+        //     console.log("fuck reloading", res.cc);
+        // }
+        capture(res.cc)
     });
+}
+
+function tabup(tabId, changeInfo, tab) {
+    if (changeInfo.status === 'complete') {
+        change(tabId, changeInfo, tab);
+    }
 }
 
 
