@@ -308,6 +308,75 @@ start.addEventListener('click', async () => {
 
 });
 
+
+function exportCh(){
+    chrome.storage.local.get({chapters: [], cc: null}, function(r){
+        const chs = r.chapters;
+        const cc = r.cc;
+        if (!cc){
+            toast("Dumb! select a chapter first", "error");
+            return;
+        }
+const ch = chs.find(c => c.id == cc)
+if (!ch){
+    toast("IDK wtf you did find the err yourself, hahah", "error")
+    return;
+}
+const inp = confirm("Export as? JSON = OK, PDF(note it will be in HTML format) = Cancel  (sorry I am lazy to make a proper UI for this)");
+if (inp){
+
+    const j = JSON.stringify(ch, null, 2);
+    const b = new Blob([j], {type: 'application/json'});
+    const url = URL.createObjectURL(b);
+    const a = document.createElement('a')
+    a.href = url;
+    try {
+
+    a.download = `${ch.title}-export.json`
+    } catch(e){
+        toast("your title has something wierd in it I am not adding a regex just rename it manually", "warning");
+        return
+}
+document.body.appendChild(a);
+a.click();
+a.remove();
+URL.revokeObjectURL(url)
+toast("EXPORTED JSON YAYAYY :D", "success")
+
+        }
+        else{
+            let cont = `<h1> ${ch.title} </h1>`
+            if (ch.cards && ch.cards.length){
+                ch.cards.forEach((c, i)=>{
+                    cont += `<div style="margin: 20px 5px; padding: 10px;">
+                    <h3> ${i+1} --- ${c.title} </h3>
+                    <a href="${c.url}" target="_blank" > URL </a>
+                    <br/>
+                    <img src="${c.img}" style="max-width: 400px; max-height: 250px;"/>
+                    <br/>
+                    <small> time -- ${new Date(c.time).toLocaleString()} </small>
+                    </div>
+                    <hr/>
+                    `
+                })
+            }
+            else{
+                cont += "<h3> NO CARDS </h3>"
+            }
+            const b = new Blob([cont], {type: 'text/html'});
+            const url = URL.createObjectURL(b);
+            const a = document.createElement('a')
+            a.href = url;
+            a.download = `${ch.title}-export.pdf.html`
+            document.body.appendChild(a);
+            a.click()
+            a.remove()
+        URL.revokeObjectURL(url)
+        toast("EXPORTED PDF YAYAYY :D", "success")
+        }
+});
+}
+
 // stop.addEventListener('click', async () => {
 //     console.log("stop clicked");
 // });
@@ -316,6 +385,7 @@ exportbtn.addEventListener('click', async () => {
     console.log("export clicked");
     // this is tuff :sadge:
     toast("export clicked", "info");
+    exportCh();
 });
 
 document.getElementById('ch').addEventListener('change', (e) => {
@@ -433,7 +503,7 @@ chrome.storage.local.get({automode: false, autorunning: false}, (r) => {
     autostop.disabled = !autorunning
 })
 
-
+// searched for a good toast function and found this on stackoverflow :D ( still I modified stuff a bit)
 function toast(msg, type='info'){
     const c = document.getElementById('toast');
     const color = {
@@ -455,5 +525,10 @@ setTimeout(() => {
     setTimeout(() => {
         c.removeChild(t)
     }, 500);
-}, 7000);
+}, 6000);
 }
+
+
+// document.getElementById('export').addEventListener('click', () => {
+//     toast("Export clicked", "info");
+// });
