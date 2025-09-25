@@ -250,7 +250,17 @@ t.className = "font-semibold";
     ti.innerText = new Date(time).toLocaleString();
 
     const del = document.createElement('button');
-    dets.appendChild(no);
+    del.className = "p-2 px-3 bg-red-600 rounded-full shadow-xl hover:bg-red-800 text-white";
+    del.innerText= "X";
+    del.onclick = () => delC(time)
+    
+
+    const d2 = document.createElement('div');
+    d2.className = "flex justify-between w-full items-center";
+
+    d2.appendChild(no);
+    d2.appendChild(del);
+    dets.appendChild(d2);
     dets.appendChild(t);
     dets.appendChild(u);
     dets.appendChild(ti);
@@ -258,6 +268,22 @@ t.className = "font-semibold";
     x.appendChild(dets);
     board.appendChild(x);
     // loadC();
+}
+
+
+function delC(id){
+    if (!confirm("broo this is not a joke!!? this would be sent in a blackhole are you sure")) return;
+    const c = document.getElementById('ch').value;
+    chrome.storage.local.get({chapters: []}, function(r){
+        const chs = r.chapters;
+        const ch = chs.find(c => c.id == c);
+        if (ch){
+            ch.cards = ch.cards.filter(card => card.time != id);
+            chrome.storage.local.set({chapters: chs}, function(){
+                load(c);
+            })
+        }
+    })
 }
 
 start.addEventListener('click', async () => {
