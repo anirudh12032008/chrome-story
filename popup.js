@@ -345,34 +345,67 @@ toast("EXPORTED JSON YAYAYY :D", "success")
 
         }
         else{
-            let cont = `<h1> ${ch.title} </h1>`
-            if (ch.cards && ch.cards.length){
-                ch.cards.forEach((c, i)=>{
-                    cont += `<div style="margin: 20px 5px; padding: 10px;">
-                    <h3> ${i+1} --- ${c.title} </h3>
-                    <a href="${c.url}" target="_blank" > URL </a>
-                    <br/>
-                    <img src="${c.img}" style="max-width: 400px; max-height: 250px;"/>
-                    <br/>
-                    <small> time -- ${new Date(c.time).toLocaleString()} </small>
-                    </div>
-                    <hr/>
-                    `
-                })
-            }
-            else{
-                cont += "<h3> NO CARDS </h3>"
-            }
-            const b = new Blob([cont], {type: 'text/html'});
-            const url = URL.createObjectURL(b);
-            const a = document.createElement('a')
-            a.href = url;
-            a.download = `${ch.title}-export.pdf.html`
-            document.body.appendChild(a);
-            a.click()
-            a.remove()
-        URL.revokeObjectURL(url)
-        toast("EXPORTED PDF YAYAYY :D", "success")
+            // making pdf style html for now
+        //     let cont = `<h1> ${ch.title} </h1>`
+        //     if (ch.cards && ch.cards.length){
+        //         ch.cards.forEach((c, i)=>{
+        //             cont += `<div style="margin: 20px 5px; padding: 10px;">
+        //             <h3> ${i+1} --- ${c.title} </h3>
+        //             <a href="${c.url}" target="_blank" > URL </a>
+        //             <br/>
+        //             <img src="${c.img}" style="max-width: 400px; max-height: 250px;"/>
+        //             <br/>
+        //             <small> time -- ${new Date(c.time).toLocaleString()} </small>
+        //             </div>
+        //             <hr/>
+        //             `
+        //         })
+        //     }
+        //     else{
+        //         cont += "<h3> NO CARDS </h3>"
+        //     }
+        //     const b = new Blob([cont], {type: 'text/html'});
+        //     const url = URL.createObjectURL(b);
+        //     const a = document.createElement('a')
+        //     a.href = url;
+        //     a.download = `${ch.title}-export.pdf.html`
+        //     document.body.appendChild(a);
+        //     a.click()
+        //     a.remove()
+        // URL.revokeObjectURL(url)
+        // toast("EXPORTED PDF YAYAYY :D", "success")
+
+
+
+        // trying jspdf :/
+        const {jsPDF} = window.jspdf;
+        const doc = new jsPDF();
+// doc.text("Hello world!", 10, 10);
+// doc.save("a4.pdf");
+doc.setFontSize(22);
+doc.text(ch.title, 10,20);
+let y =31
+if (ch.cards && ch.cards.length){
+    ch.cards.forEach((c, i)=>{
+        doc.setfontSize(16);
+        doc.text(`${i+1} --- ${c.title}`, 10, y)
+        y += 6
+        doc.setFontSize(10);
+        doc.text(`URL --- ${c.url}`, 10, y)
+        y+= 6 
+        doc.image(c.img, 'PNG', 10, y, 180, 100);   
+        y += 117 
+        if (y >270){
+            doc.addPage();
+            y = 10
+        }
+
+    })
+} else {
+    doc.text("bruh you have nothing :((((", 10, y)
+}
+doc.save(`${ch.title}-export.pdf`);
+toast("EXPORTED PDF YAYAYY :D", "success")
         }
 });
 }
