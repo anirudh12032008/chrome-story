@@ -551,11 +551,11 @@ t.innerHTML = msg;
 c.appendChild(t);
 
 requestAnimationFrame(() => {
-    toast.classList.remove('opacity-0', "trasnlate-y-4");
+    t.classList.remove('opacity-0', "translate-y-3");
     // toast.classList.add('opacity-100', "translate-y-0");
 })
 setTimeout(() => {
-    t.classList.add('opacity-0', "translate-y-4");
+    t.classList.add('opacity-0', "translate-y-3");
     setTimeout(() => {
         c.removeChild(t)
     }, 500);
