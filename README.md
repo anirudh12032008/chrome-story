@@ -1,6 +1,12 @@
 # Chrome Story
 Bored from using history mode or bookmarks in chrome?? TRY CHROME STORY, its a super awesome extension that allows you to make visual bookmarks or view your browsing history in a very cool way using screen shots!!
+
+<img width="713" height="600" alt="ex17" src="https://github.com/user-attachments/assets/f307f225-4036-4528-a59d-587f7733cae4" />
+
+
 ### PS - It may sent this to your parents :shhh:
+
+
 
 Browsing is not just a task! its a adventure!!! and that adventure desevers a whole book to itself!!
 use this extension to create that book!! you can make new chapters, add new cards and enjoy the journey!!!!
@@ -18,6 +24,8 @@ It has 2 modes -
 DW I got you bro! just click on the manage button to open the channel list and then you can set new titles! delete some chapters ( you can't keep some stuff you know :P, hahahaha)
 want to edit a card?? you can just delete a card!! but why? cause why the hell do you want to edit a card?? are you trying to hide something.....Shhshhshshsh just delete it :D 
 
+<img width="822" height="615" alt="ex15" src="https://github.com/user-attachments/assets/8276371e-1664-4f32-8a43-476372f287e9" />
+
 ### It even has toasts
 yeah you can dip this in tea :D 
 but the messages you will get is the coolest part!! HAHAHAHAH
@@ -26,7 +34,12 @@ but the messages you will get is the coolest part!! HAHAHAHAH
 YES you can also export your chapters! 
 There are two possible ways you can do that -
 1. JSON -  just for the nerdy people who want to access the raw data :D or even scrap the whole book through a APi or what lol :P ( note: The images will be in base64 format, imagine the length of that string :D )
+
+<img width="1143" height="531" alt="ex23" src="https://github.com/user-attachments/assets/c594b9ef-4b4f-4e6b-96d4-c7d64e1db56f" />
+
 2. PDF - this is for the weaks!! just get a ready made pdf file with all the images ( the actual images not just a unreadable base64 string :D ) and it also contains all the necessary details! and the links are even clickable!!!!
+
+<img width="1366" height="653" alt="ex25" src="https://github.com/user-attachments/assets/5c29e0d4-3271-4e27-b3fd-683de4e58984" />
 
 ### Want to import??
 You can't LMAO, i'll be working on that in the future releases but as of now you can't :(
