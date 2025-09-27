@@ -1,7 +1,7 @@
 # Chrome Story
 Bored from using history mode or bookmarks in chrome?? TRY CHROME STORY, its a super awesome extension that allows you to make visual bookmarks or view your browsing history in a very cool way using screen shots!!
 
-<img width="713" height="600" alt="ex17" src="https://github.com/user-attachments/assets/f307f225-4036-4528-a59d-587f7733cae4" />
+<img width="697" height="600" alt="pp" src="https://github.com/user-attachments/assets/ee6c7ac1-f4ff-4ada-93a7-d2b36ddb278d" />
 
 
 ### PS - It may sent this to your parents :shhh:
